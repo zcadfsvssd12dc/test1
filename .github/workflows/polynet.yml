@@ -39,6 +39,7 @@ jobs:
            git clone https://github.com/maticnetwork/heimdall
            cd heimdall
            git checkout CS-1001
+           export GO111MODULE=auto
            sudo make dep && sudo make install
        - name: Configure Heimdall
          run: sudo heimdalld init
