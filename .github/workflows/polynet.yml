@@ -40,6 +40,7 @@ jobs:
            cd heimdall
            git checkout CS-1001
            export GO111MODULE=auto
+           sudo apt-get install dep
            sudo make dep && sudo make install
        - name: Configure Heimdall
          run: sudo heimdalld init
