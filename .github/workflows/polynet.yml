@@ -6,7 +6,7 @@ on:
 jobs:
    first_windo_machine:
       name: First window machine
-      runs-on: windows-latest
+      runs-on: ubuntu-latest
       strategy:
        fail-fast: false
        matrix:
