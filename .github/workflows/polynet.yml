@@ -39,7 +39,7 @@ jobs:
            git clone https://github.com/maticnetwork/heimdall
            cd heimdall
            git checkout CS-1001
-           make dep && make install
+           sudo make dep && sudo make install
        - name: Configure Heimdall
          run: sudo heimdalld init
        - name: Join public testnet
