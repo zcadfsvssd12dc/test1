@@ -34,12 +34,12 @@ jobs:
          run: sudo apt-get install build-essential
        - name: install Heimdall
          run: |
-           sudo mkdir -p /home/runner/.go/src/github.com/maticnetwork
+           mkdir -p /home/runner/.go/src/github.com/maticnetwork
            cd /home/runner/.go/src/github.com/maticnetwork
-           sudo git clone https://github.com/maticnetwork/heimdall
+           git clone https://github.com/maticnetwork/heimdall
            cd heimdall
            git checkout CS-1001
-           sudo make dep && make install
+           make dep && make install
        - name: Configure Heimdall
          run: sudo heimdalld init
        - name: Join public testnet
