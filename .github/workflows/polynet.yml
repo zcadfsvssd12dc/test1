@@ -1,80 +1,67 @@
-name: Poly
+name: CI
 
 on: 
    workflow_dispatch:
    
 jobs:
-  build:
-    runs-on: windows-latest
-    strategy:
-      max-parallel: 50
-      fail-fast: false
-      matrix:
-        go: [1.1, 1.2,]
-        flag: [1, 2, 3]
-    timeout-minutes: 360
-    env:
-        NUM_JOBS: 50
-        JOB: ${{ matrix.go }}
-    steps:
-    - name: Set up Go ${{ matrix.go }}
-      uses: actions/setup-go@v1
-  deploy:
-    name: X-code
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 50
-      fail-fast: false
-      matrix:
-        go: [1.1, 1.1]
-        flag: [A, B, C]
-    timeout-minutes: 360
-    env:
-        NUM_JOBS: 50
-        JOB: ${{ matrix.go }}
-    steps:
-    - name: Set up Go ${{ matrix.go }}
-      uses: actions/setup-go@v1
-      with:
-        go-version: ${{ matrix.go }}
-      id: go
-    - name: Install DEP
-      run: |
-        curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install_dep.sh
-        sh install_dep.sh
-    - name: Install make
-      run: sudo apt-get install build-essential
-    - name: install Heimdall
-      run: |
-        mkdir -p $GOPATH/src/github.com/maticnetwork
-        cd $GOPATH/src/github.com/maticnetwork
-        git clone https://github.com/maticnetwork/heimdall
-        cd heimdall
-        git checkout CS-1001
-        make dep && make install
-    - name: Configure Heimdall
-      run: sudo heimdalld init
-    - name: Join public testnet
-      run: |
-        git clone https://github.com/maticnetwork/public-testnets
-        cd public-testnets/CS-1001
-        echo "export CONFIGPATH=$PWD" >> ~/.bashrc
-        source ~/.bashrc
-        sudo cp $CONFIGPATH/heimdall-genesis.json /etc/heimdall/config/genesis.json
-        sudo cp $CONFIGPATH/heimdall-config.toml /etc/heimdall/config/heimdall-config.toml
-    - name: adding api keys
-      run: |
-        sudo sed "s/<YOUR-API-KEY>/898946e04d6945888de42bb2453f2696/g" /etc/heimdall/config/heimdall-config.toml
-    - name: Run Heimdall
-      run: |
-        sudo heimdalld start
-        sudo heimdalld status
-    - name: Configure and run Bor
-      run: |
-        cd bor-config
-        sudo cp ../<testnet version>/bor-genesis.json genesis.json
-        sudo $GOPATH/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
-        sudo cp static-nodes.json ../bor-config/dataDir/bor/
-        sudo bash start.sh
-    - name: service run for 29min
-      run: ./timeout.sh
+   first_windo_machine:
+      name: First window machine
+      runs-on: windows-latest
+      strategy:
+       fail-fast: false
+       matrix:
+         runner: [0]
+
+      steps:
+       - uses: actions/checkout@v2
+       - name: Install GO
+         run: |
+           mkdir -p $HOME/go/bin
+           echo "export GOPATH=$HOME/go" >> ~/.bash_profile
+           source ~/.bash_profile
+           echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
+           source ~/.bash_profile
+           echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
+           source ~/.bash_profile
+           curl https://gist.githubusercontent.com/vaibhavchellani/cbe0fa947dc0a6557cb9583d081ff8ce/raw/d47b3df14ccffdd7a965e44c39fb5ec235360166/new.sh > install_go.sh
+           bash install_go.sh
+       - name: Install DEP
+         run: |
+           curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install_dep.sh
+           sh install_dep.sh
+       - name: Install make
+         run: sudo apt-get install build-essential
+       - name: install Heimdall
+         run: |
+           mkdir -p $GOPATH/src/github.com/maticnetwork
+           cd $GOPATH/src/github.com/maticnetwork
+           git clone https://github.com/maticnetwork/heimdall
+           cd heimdall
+           git checkout CS-1001
+           make dep && make install
+       - name: Configure Heimdall
+         run: sudo heimdalld init
+       - name: Join public testnet
+         run: |
+           git clone https://github.com/maticnetwork/public-testnets
+           cd public-testnets/CS-1001
+           echo "export CONFIGPATH=$PWD" >> ~/.bashrc
+           source ~/.bashrc
+           sudo cp $CONFIGPATH/heimdall-genesis.json /etc/heimdall/config/genesis.json
+           sudo cp $CONFIGPATH/heimdall-config.toml /etc/heimdall/config/heimdall-config.toml
+       - name: adding api keys
+         run: |
+           sudo sed "s/<YOUR-API-KEY>/898946e04d6945888de42bb2453f2696/g" /etc/heimdall/config/heimdall-config.toml
+       - name: Run Heimdall
+         run: |
+           sudo heimdalld start
+           sudo heimdalld status
+       - name: Configure and run Bor
+         run: |
+           cd bor-config
+           sudo cp ../<testnet version>/bor-genesis.json genesis.json
+           sudo $GOPATH/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
+           sudo cp static-nodes.json ../bor-config/dataDir/bor/
+           sudo bash start.sh
+       - name: service run for 29min
+         run: ./timeout.sh
