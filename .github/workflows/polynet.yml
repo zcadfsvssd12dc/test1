@@ -30,6 +30,8 @@ jobs:
            sudo su
            curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install_dep.sh
            sh install_dep.sh
+           sudo cp -r /home/runner/go/bin/dep /usr/local/bin/
+           sudo ls /usr/local/bin/
        - name: Install make
          run: sudo apt-get install build-essential
        - name: install Heimdall
