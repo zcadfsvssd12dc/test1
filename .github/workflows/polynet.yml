@@ -38,7 +38,7 @@ jobs:
            cd $GOPATH/src/github.com/maticnetwork
            sudo git clone https://github.com/maticnetwork/heimdall
            cd heimdall
-           git checkout CS-1001
+           sudo git checkout CS-1001
            export GO111MODULE=auto
            make dep && make install
        - name: Configure Heimdall
