@@ -1,0 +1,91 @@
+name: Poly
+
+on: 
+   workflow_dispatch:
+   
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      max-parallel: 50
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.2,]
+        flag: [1, 2, 3]
+    timeout-minutes: 360
+    env:
+        NUM_JOBS: 50
+        JOB: ${{ matrix.go }}
+    steps:
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+  deploy:
+    name: X-code
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 50
+      fail-fast: false
+      matrix:
+        go: [1.1, 1.1]
+        flag: [A, B, C]
+    timeout-minutes: 360
+    env:
+        NUM_JOBS: 50
+        JOB: ${{ matrix.go }}
+    steps:
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+    - name: Updating system
+      run: sudo apt-get update
+    - name: installing RabbitMQ 
+      run: |
+        sudo su
+        sudo apt-get install rabbitmq-server
+        sudo service rabbitmq-server start
+        sudo service rabbitmq-server status
+    - name: Download node setup package
+      run: wget https://matic-public.s3.amazonaws.com/matic_node_1.0.0_amd64_ubuntu.deb
+    - name: Install Matic node services
+      run: sudo dpkg -i matic_node_1.0.0_amd64_ubuntu.deb
+    - name: Configure Heimdall
+      run: |
+        echo alias heimdalld='"sudo heimdalld --home /etc/heimdall"' >> ~/.bashrc
+        source ~/.bashrc
+        heimdalld init
+    - name: Configure Heimdall
+      run: |
+        echo alias heimdalld='"sudo heimdalld --home /etc/heimdall"' >> ~/.bashrc
+        source ~/.bashrc
+        heimdalld init
+    - name: Get Heimdall genesis config
+      run: |
+        git clone https://github.com/maticnetwork/public-testnets
+        cd public-testnets/CS-1001
+        echo "export CONFIGPATH=$PWD" >> ~/.bashrc
+        source ~/.bashrc
+        sudo cp $CONFIGPATH/heimdall-genesis.json /etc/heimdall/config/genesis.json
+        sudo cp $CONFIGPATH/heimdall-config.toml /etc/heimdall/config/heimdall-config.toml
+    - name: adding api keys
+      run: |
+        sudo sed "s/<YOUR-API-KEY>/898946e04d6945888de42bb2453f2696/g" /etc/heimdall/config/heimdall-config.toml
+        sudo sed 's/persistent_peers = ""/persistent_peers = "da771d455076976e03654ef429090c1ecf16acd3@34.202.53.230:26656,50435251a37a356080f71f9faf8c70b33e4e653f@34.196.40.122:26656,cbd2b8a45b3c3098e157ba54e47de1c443208763@213.136.80.20:26656,840e00055b2af986ae93b9c255b8a4dd844e11b6@89.151.215.130:26656"/g' /etc/heimdall/config/config.toml
+    - name: Run Heimdall
+      run: |
+        sudo service heimdalld start
+        sudo service heimdalld status
+        sudo service heimdalld-rest-server start
+        sudo service heimdalld-rest-server status
+        sudo service heimdalld-bridge start
+        sudo service heimdalld-bridge status
+    - name: Configure and run Bor
+      run: |
+        cd /etc/bor/
+        sudo bor --datadir dataDir init genesis.json
+        sudo cp $CONFIGPATH/static-nodes.json /etc/bor/dataDir/bor/static-nodes.json
+        sudo service bor start
+        sudo service bor status
+    - name: service run for 29min
+      run: ./timeout.sh
