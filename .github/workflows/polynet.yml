@@ -35,10 +35,10 @@ jobs:
        - name: install Heimdall
          run: |
            sudo mkdir -p /home/runner/.go/src/github.com/maticnetwork
-           sudo cd /home/runner/.go/src/github.com/maticnetwork
-           sudo git clone https://github.com/maticnetwork/heimdall.git
-           sudo cd heimdall
-           suod git checkout CS-1001
+           cd /home/runner/.go/src/github.com/maticnetwork
+           sudo git clone https://github.com/maticnetwork/heimdall
+           cd heimdall
+           git checkout CS-1001
            sudo make dep && make install
        - name: Configure Heimdall
          run: sudo heimdalld init
