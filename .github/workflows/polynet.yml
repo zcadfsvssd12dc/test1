@@ -42,7 +42,7 @@ jobs:
            cd heimdall
            sudo git checkout CS-1001
            export GO111MODULE=auto
-           make dep && make install
+           sudo make dep && sudo make install
        - name: Configure Heimdall
          run: sudo heimdalld init
        - name: Join public testnet
