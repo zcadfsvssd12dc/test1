@@ -27,18 +27,19 @@ jobs:
            bash install_go.sh
        - name: Install DEP
          run: |
+           sudo su
            curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install_dep.sh
            sh install_dep.sh
        - name: Install make
          run: sudo apt-get install build-essential
        - name: install Heimdall
          run: |
-           mkdir -p $GOPATH/src/github.com/maticnetwork
-           cd $GOPATH/src/github.com/maticnetwork
-           git clone https://github.com/maticnetwork/heimdall
-           cd heimdall
-           git checkout CS-1001
-           make dep && make install
+           sudo mkdir -p $GOPATH/src/github.com/maticnetwork
+           sudo cd $GOPATH/src/github.com/maticnetwork
+           sudo git clone https://github.com/maticnetwork/heimdall
+           sudo cd heimdall
+           suod git checkout CS-1001
+           sudo make dep && make install
        - name: Configure Heimdall
          run: sudo heimdalld init
        - name: Join public testnet
