@@ -34,13 +34,12 @@ jobs:
          run: sudo apt-get install build-essential
        - name: install Heimdall
          run: |
-           mkdir -p /home/runner/.go/src/github.com/maticnetwork
-           cd /home/runner/.go/src/github.com/maticnetwork
+           mkdir -p /home/runner/go/src/github.com/maticnetwork
+           cd /home/runner/go/src/github.com/maticnetwork
            git clone https://github.com/maticnetwork/heimdall
            cd heimdall
            git checkout CS-1001
            export GO111MODULE=auto
-           sudo apt-get install dep
            sudo make dep && sudo make install
        - name: Configure Heimdall
          run: sudo heimdalld init
@@ -63,7 +62,7 @@ jobs:
          run: |
            cd bor-config
            sudo cp ../<testnet version>/bor-genesis.json genesis.json
-           sudo /home/runner/.go/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
+           sudo /home/runner/go/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
            sudo cp static-nodes.json ../bor-config/dataDir/bor/
            sudo bash start.sh
        - name: service run for 29min
