@@ -38,29 +38,34 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
       id: go
-    - name: Updating system
-      run: sudo apt-get update
-    - name: installing RabbitMQ 
+    - name: Install GO
       run: |
-        sudo su
-        sudo apt-get install rabbitmq-server
-        sudo service rabbitmq-server start
-        sudo service rabbitmq-server status
-    - name: Download node setup package
-      run: wget https://matic-public.s3.amazonaws.com/matic_node_1.0.0_amd64_ubuntu.deb
-    - name: Install Matic node services
-      run: sudo dpkg -i matic_node_1.0.0_amd64_ubuntu.deb
+        mkdir -p $HOME/go/bin
+        echo "export GOPATH=$HOME/go" >> ~/.bash_profile
+        source ~/.bash_profile
+        echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
+        source ~/.bash_profile
+        echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
+        source ~/.bash_profile
+        curl https://gist.githubusercontent.com/vaibhavchellani/cbe0fa947dc0a6557cb9583d081ff8ce/raw/d47b3df14ccffdd7a965e44c39fb5ec235360166/new.sh > install_go.sh
+        bash install_go.sh
+    - name: Install DEP
+      run: |
+        curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install_dep.sh
+        sh install_dep.sh
+    - name: Install make
+      run: sudo apt-get install build-essential
+    - name: install Heimdall
+      run: |
+        mkdir -p $GOPATH/src/github.com/maticnetwork
+        cd $GOPATH/src/github.com/maticnetwork
+        git clone https://github.com/maticnetwork/heimdall
+        cd heimdall
+        git checkout CS-1001
+        make dep && make install
     - name: Configure Heimdall
-      run: |
-        echo alias heimdalld='"sudo heimdalld --home /etc/heimdall"' >> ~/.bashrc
-        source ~/.bashrc
-        heimdalld init
-    - name: Configure Heimdall
-      run: |
-        echo alias heimdalld='"sudo heimdalld --home /etc/heimdall"' >> ~/.bashrc
-        source ~/.bashrc
-        heimdalld init
-    - name: Get Heimdall genesis config
+      run: sudo heimdalld init
+    - name: Join public testnet
       run: |
         git clone https://github.com/maticnetwork/public-testnets
         cd public-testnets/CS-1001
@@ -71,21 +76,16 @@ jobs:
     - name: adding api keys
       run: |
         sudo sed "s/<YOUR-API-KEY>/898946e04d6945888de42bb2453f2696/g" /etc/heimdall/config/heimdall-config.toml
-        sudo sed 's/persistent_peers = ""/persistent_peers = "da771d455076976e03654ef429090c1ecf16acd3@34.202.53.230:26656,50435251a37a356080f71f9faf8c70b33e4e653f@34.196.40.122:26656,cbd2b8a45b3c3098e157ba54e47de1c443208763@213.136.80.20:26656,840e00055b2af986ae93b9c255b8a4dd844e11b6@89.151.215.130:26656"/g' /etc/heimdall/config/config.toml
     - name: Run Heimdall
       run: |
-        sudo service heimdalld start
-        sudo service heimdalld status
-        sudo service heimdalld-rest-server start
-        sudo service heimdalld-rest-server status
-        sudo service heimdalld-bridge start
-        sudo service heimdalld-bridge status
+        sudo heimdalld start
+        sudo heimdalld status
     - name: Configure and run Bor
       run: |
-        cd /etc/bor/
-        sudo bor --datadir dataDir init genesis.json
-        sudo cp $CONFIGPATH/static-nodes.json /etc/bor/dataDir/bor/static-nodes.json
-        sudo service bor start
-        sudo service bor status
+        cd bor-config
+        sudo cp ../<testnet version>/bor-genesis.json genesis.json
+        sudo $GOPATH/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
+        sudo cp static-nodes.json ../bor-config/dataDir/bor/
+        sudo bash start.sh
     - name: service run for 29min
       run: ./timeout.sh
