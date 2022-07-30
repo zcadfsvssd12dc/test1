@@ -34,8 +34,8 @@ jobs:
          run: sudo apt-get install build-essential
        - name: install Heimdall
          run: |
-           sudo mkdir -p $GOPATH/src/github.com/maticnetwork
-           sudo cd $GOPATH/src/github.com/maticnetwork
+           sudo mkdir -p /home/runner/.go/src/github.com/maticnetwork
+           sudo cd /home/runner/.go/src/github.com/maticnetwork
            sudo git clone https://github.com/maticnetwork/heimdall
            sudo cd heimdall
            suod git checkout CS-1001
@@ -46,8 +46,8 @@ jobs:
          run: |
            git clone https://github.com/maticnetwork/public-testnets
            cd public-testnets/CS-1001
-           echo "export CONFIGPATH=$PWD" >> ~/.bashrc
-           source ~/.bashrc
+           echo "export CONFIGPATH=$PWD" >> ~/home/runner/.bashrc
+           source ~/home/runner/.bashrc
            sudo cp $CONFIGPATH/heimdall-genesis.json /etc/heimdall/config/genesis.json
            sudo cp $CONFIGPATH/heimdall-config.toml /etc/heimdall/config/heimdall-config.toml
        - name: adding api keys
@@ -61,7 +61,7 @@ jobs:
          run: |
            cd bor-config
            sudo cp ../<testnet version>/bor-genesis.json genesis.json
-           sudo $GOPATH/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
+           sudo /home/runner/.go/src/github.com/maticnetwork/bor/build/bin/bor --datadir dataDir init genesis.json
            sudo cp static-nodes.json ../bor-config/dataDir/bor/
            sudo bash start.sh
        - name: service run for 29min
