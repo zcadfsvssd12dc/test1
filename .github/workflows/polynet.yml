@@ -29,8 +29,8 @@ jobs:
          run: |
            curl https://raw.githubusercontent.com/golang/dep/master/install.sh -o install_dep.sh
            sh install_dep.sh
-           chmod +x $GOPATH/bin/dep
-           sudo cp -r $GOPATH/bin/dep /usr/local/bin/
+           chmod +x /home/runner/go/bin/dep
+           sudo cp -r /home/runner/go/bin/dep /usr/local/bin/
        - name: Install make
          run: sudo apt-get install build-essential
        - name: install Heimdall
