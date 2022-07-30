@@ -36,7 +36,7 @@ jobs:
            sudo su
            sudo mkdir -p $GOPATH/src/github.com/maticnetwork
            cd $GOPATH/src/github.com/maticnetwork
-           git clone https://github.com/maticnetwork/heimdall
+           sudo git clone https://github.com/maticnetwork/heimdall
            cd heimdall
            git checkout CS-1001
            export GO111MODULE=auto
