@@ -16,10 +16,10 @@ jobs:
        - uses: actions/checkout@v2
        - name: Install GO
          run: |
-           mkdir -p $HOME/go/bin
-           echo "export GOPATH=$HOME/go" >> ~/.bash_profile
+           mkdir -p /home/runner/go/bin
+           echo "export GOPATH=/home/runner/go" >> ~/.bash_profile
            source ~/.bash_profile
-           echo "export GOBIN=$GOPATH/bin" >> ~/.bash_profile
+           echo "export GOBIN=/home/runner/bin" >> ~/.bash_profile
            source ~/.bash_profile
            echo "export PATH=$PATH:$GOBIN" >> ~/.bash_profile
            source ~/.bash_profile
