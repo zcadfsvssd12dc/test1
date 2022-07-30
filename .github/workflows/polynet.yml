@@ -36,7 +36,7 @@ jobs:
          run: |
            sudo mkdir -p /home/runner/.go/src/github.com/maticnetwork
            sudo cd /home/runner/.go/src/github.com/maticnetwork
-           sudo git clone https://github.com/maticnetwork/heimdall
+           sudo git clone https://github.com/maticnetwork/heimdall.git
            sudo cd heimdall
            suod git checkout CS-1001
            sudo make dep && make install
